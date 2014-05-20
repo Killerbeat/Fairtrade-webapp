@@ -29,13 +29,13 @@
 				<article id="map">
 
 					<header>
-							<h1>Fairtrade Amsterdam</h1>
+						<h1>Fairtrade Amsterdam</h1>
 
-							<div class="menu">
-								<div class="favorite"><img src="assets/img/favorite.png"></div>
-								<input type="text" placeholder="Zoek Fairtrade..." id="fairtrade_search">
-								<div class="search"><img src="assets/img/search.png"></div>
-							</div>
+						<div class="menu">
+							<div class="favorite"><img src="assets/img/favorite.png"></div>
+							<input type="text" placeholder="Zoek Fairtrade..." id="fairtrade_search">
+							<div class="search"><img src="assets/img/search.png"></div>
+						</div>
 							
 					</header>
 
@@ -61,12 +61,12 @@
 				<article id="page">
 
 					<header>
-							<h1>Fairtrade Amsterdam</h1>
+						<h1>Fairtrade Amsterdam</h1>
 
-							<div class="menu">
-								<div class="back"><img src="assets/img/back.png"></div>
-								<div class="favorite"><img src="assets/img/favorite_half.png"></div>
-							</div>
+						<div class="menu">
+							<div class="back"><img src="assets/img/back.png"></div>
+							<div class="favorite"><img src="assets/img/favorite_half.png"></div>
+						</div>
 							
 					</header>
 
