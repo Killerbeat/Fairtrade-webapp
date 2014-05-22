@@ -1,6 +1,6 @@
 var map;
 var favorites_list 	= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
-var categories 		= "";
+var categories 		= [];
 var api 			= "assets/php/dl.php?file=http://fairtradeamsterdam.nl";
 var allMarkers 		= [];
 
@@ -27,7 +27,11 @@ $(function(){
 				allMarkers[company].setMap(map);
 
 			}else{
-				if(allMarkers[company].company_cat !== parseInt($(this).attr("data-id"))){
+
+				console.log("marker cat: ", allMarkers[company].company_cat, "li cat:", 
+					parseInt($(this).attr("data-id")));
+
+				if(allMarkers[company].company_cat !== $(this).attr("data-id")){
 					allMarkers[company].setMap(null);
 				}else{
 					allMarkers[company].setMap(map);
@@ -88,12 +92,15 @@ $(function(){
 
 			    		var company_name = search_data[i].name.replace(query, "<span>"+ query +"</span>")
 
+			    		console.log(search_data[i].name)
 			    		results.push(Array(company_name, search_data[i].address, search_data[i].id));
 			    	}
 
 			    	if(i == 1){break}
 
 			    }
+
+			console.log(results);
 
 			    if(results.length !== 0){
 
@@ -203,8 +210,14 @@ function showPage(id, place_id){
 		//Company page
 		case 2:
 
+			console.log(api +"/api/companies?id="+ place_id);
+
 			$.post(api +"/api/companies?id="+ place_id, function(data) {
+
 				var company_content = jQuery.parseJSON(data);
+					company_content	= company_content[0];
+
+				console.log(company_content[0])
 
 				page_title.html("Fairtrade bedrijf");
 				company_title.html(company_content.name);
@@ -253,10 +266,11 @@ function loadCategories(){
 
 		for (var item in cats) {
 			$("#company_category").append('<li data-id="'+ cats[item].id +'"><span style="background-color: '+ cats[item].color +';"></span>'+ cats[item].name +'</li>');
+			categories[cats[item].id] = cats[item].color
 
 		}
 
-		categories = cats;
+		console.log(categories);
 
 	});
 }
@@ -266,7 +280,8 @@ function createFavorites(id){
 	$.post(api +"/api/companies?id="+ id, function(data) {
 
 		var company_data = jQuery.parseJSON(data);
-		
+			company_data = company_data[0];
+
 		var favorite_li = '<li style="background-image: url(assets/img/default.png)"><img src="assets/img/favorite.png" data-id="'+ id +'"><h2 data-id="'+ id +'">'+ company_data.name +'</h2></li>';
 
 		$("#favorites ul").append(favorite_li);
@@ -292,31 +307,60 @@ function createMap(){
 
 		var company_data = jQuery.parseJSON(data);
 
-		for (var i = 0; i < company_data.length; i++) {
+		$.each(company_data, function(key, company){
 
-			location = new google.maps.LatLng(company_data[i].lat, company_data[i].lng);
+			location = new google.maps.LatLng(company.lat, company.lng);
 
 			company_marker = new google.maps.Marker({
-			  position: location,
-			  map: map,
-			  icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ categories[company_data[i].category].color.substring(1)
-		 	});
+				position: location,
+				map: map,
+				icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ categories[company.category].substring(1)
+			});
 
-		 	company_marker.company_id 	= company_data[i].id;
-		 	company_marker.company_cat 	= categories[company_data[i].category].id;	
+			//console.log(company.category, company.id)
 
-	        
-	        (function(company_marker, i) {
+			company_marker.company_id 	= company.id;
+			company_marker.company_cat 	= company.category;	
 
-			  	google.maps.event.addListener(company_marker, 'click', function(data) {
-		  			showPage(2, company_marker.company_id);
-			  	});
+		    (function(company_marker, i) {
 
-	        })(company_marker, i);
+				google.maps.event.addListener(company_marker, 'click', function(data) {
+			  		
+					console.log(company_marker.company_id)
 
-	        allMarkers.push(company_marker);
+			  		showPage(2, parseInt(company_marker.company_id));
+				});
 
-		}
+		    })(company_marker, key);
+
+		    allMarkers.push(company_marker);
+
+		});
+
+		/*for (var i = 0; i <= company_data.length; i++) {
+
+			
+
+			company_marker = new google.maps.Marker({
+				position: location,
+				map: map,
+				icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ 
+					categories[company_data[i].category].substring(1)
+			});
+
+			company_marker.company_id 	= company_data.id;
+			company_marker.company_cat 	= categories[company_data[i].category].id;	
+		        
+		    (function(company_marker, i) {
+
+				google.maps.event.addListener(company_marker, 'click', function(data) {
+			  		showPage(2, company_marker.company_id);
+				});
+
+		    })(company_marker, i);
+
+		    allMarkers.push(company_marker);
+		}*/
 
 	});
 

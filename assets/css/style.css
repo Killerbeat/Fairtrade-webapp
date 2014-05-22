@@ -156,7 +156,8 @@ header h1 {
 	padding: 7px;
 	border-radius: 5px;
 	margin-top: 10px;
-	margin-left: 50px;
+	margin-left: 15%;
+	left: 50%;
 	width: 65%;
 
 	transition: all 200ms;
@@ -206,7 +207,9 @@ footer #company_category {
 	bottom: 50px;
 	background-color: rgba(0,0,0,0.8);
 	width: 100%;
+	max-height: 80%;
 	display: none;
+	overflow-y: auto;
 }
 
 footer #company_category li {
@@ -248,6 +251,7 @@ footer select option {
 	overflow: auto;
 	list-style: none;
 	border-bottom: 1px solid #000;
+	background-size: 100% auto;
 }
 
 #favorites h2 {
