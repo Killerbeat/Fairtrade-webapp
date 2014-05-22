@@ -96,7 +96,15 @@ $(function(){
 			    		results.push(Array(company_name, search_data[i].address, search_data[i].id));
 			    	}
 
-			    	if(i == 1){break}
+			    	if(search_data[i].address.indexOf(query) != -1){
+
+			    		var company_name 	= search_data[i].name;
+			    		var company_adress 	= search_data[i].address.replace(query, "<span>"+ query +"</span>")
+
+			    		console.log(search_data[i].address)
+			    		results.push(Array(company_name, company_adress, search_data[i].id));
+			    	}
+			    	//if(i == 1){break}
 
 			    }
 
