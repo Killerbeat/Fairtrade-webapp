@@ -1,10 +1,8 @@
 var map;
 var favorites_list 	= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
 var categories 		= "";
-var api 			= "http://fairtradeamsterdam.nl";
+var api 			= "assets/php/dl.php?file=http://fairtradeamsterdam.nl";
 var allMarkers 		= [];
-
-console.log(favorites_list);
 
 $(function(){
 
@@ -23,11 +21,7 @@ $(function(){
 
 	$(document).on("click", "#company_category li", function(){
 
-		console.log("click")
-
 		for (var company in allMarkers) {
-
-			console.log(allMarkers[company])
 
 			if($(this).attr("data-id") == "all"){
 				allMarkers[company].setMap(map);
@@ -101,8 +95,6 @@ $(function(){
 
 			    }
 
-			    console.log(results.length);
-
 			    if(results.length !== 0){
 
 			    	$("#search_results").html("").show()
@@ -114,8 +106,6 @@ $(function(){
 			    }else{
 			    	$("#search_results").hide();
 			    }
-
-			    console.log(results);
 
 		    });
 
@@ -139,8 +129,6 @@ $(function(){
 				$(this).remove();
 			});
 		}
-
-		console.log(favorites_list);
 
 	})
 
@@ -168,7 +156,6 @@ $(function(){
 		}
 
 		localStorage.favorites = JSON.stringify(favorites_list)
-		console.log(favorites_list);
 
 	});
 
@@ -196,18 +183,13 @@ function showPage(id, place_id){
 			menu_favorite.hide();
 			favorites.show();
 
-			console.log(Object.keys(favorites_list).length);
-
 			if(Object.keys(favorites_list).length <= 0){
 				$("#favorites").html("<p>Je hebt nog geen favorite Fairtrade winkels</p>");
-				console.log(Object.keys(favorites_list).length)
 			}else{
 
 				$("#favorites").html("<ul></ul>");
 
 				for (var star in favorites_list) {
-					console.log(star);
-
 					createFavorites(favorites_list[star]);
 				}
 
@@ -221,12 +203,8 @@ function showPage(id, place_id){
 		//Company page
 		case 2:
 
-			console.log(api +"/api/companies?id="+ place_id);
-
 			$.post(api +"/api/companies?id="+ place_id, function(data) {
 				var company_content = jQuery.parseJSON(data);
-
-				console.log(company_content);
 
 				page_title.html("Fairtrade bedrijf");
 				company_title.html(company_content.name);
@@ -243,15 +221,11 @@ function showPage(id, place_id){
 
 				for(var star in favorites_list){
 
-					console.log(favorites_list[star], make_favorite.attr("data-id"));
-
 					if(make_favorite.attr("data-id") == favorites_list[star]){
 						$("#page .favorite img").attr("src", "assets/img/favorite.png");
 						break;
-						console.log("active");
 					}else{
 						$("#page .favorite img").attr("src", "assets/img/favorite_half.png");
-						console.log("not active")
 					}
 
 				}
@@ -278,7 +252,6 @@ function loadCategories(){
 		$("#company_category").append('<li data-id="all">Geef alle bedrijven weer</li>');
 
 		for (var item in cats) {
-			console.log(cats[item]);
 			$("#company_category").append('<li data-id="'+ cats[item].id +'"><span style="background-color: '+ cats[item].color +';"></span>'+ cats[item].name +'</li>');
 
 		}
@@ -292,10 +265,7 @@ function createFavorites(id){
 
 	$.post(api +"/api/companies?id="+ id, function(data) {
 
-		console.log("assets/php/dl.php?file=http://localhost/api/companies?id="+ id)
 		var company_data = jQuery.parseJSON(data);
-
-		console.log(company_data);
 		
 		var favorite_li = '<li style="background-image: url(assets/img/default.png)"><img src="assets/img/favorite.png" data-id="'+ id +'"><h2 data-id="'+ id +'">'+ company_data.name +'</h2></li>';
 
@@ -324,7 +294,6 @@ function createMap(){
 
 		for (var i = 0; i < company_data.length; i++) {
 
-			console.log(company_data[i]);
 			location = new google.maps.LatLng(company_data[i].lat, company_data[i].lng);
 
 			company_marker = new google.maps.Marker({
@@ -336,7 +305,6 @@ function createMap(){
 		 	company_marker.company_id 	= company_data[i].id;
 		 	company_marker.company_cat 	= categories[company_data[i].category].id;	
 
-		 	//console.log("category", categories[company_data[i].category].color, company_data[i].category);
 	        
 	        (function(company_marker, i) {
 
@@ -349,8 +317,6 @@ function createMap(){
 	        allMarkers.push(company_marker);
 
 		}
-
-		console.log(allMarkers)
 
 	});
 
