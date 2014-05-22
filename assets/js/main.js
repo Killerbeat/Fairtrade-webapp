@@ -1,5 +1,6 @@
 var map;
 var favorites_list = localStorage.favorites? JSON.parse(localStorage.favorites) : [];
+var categories = "";
 
 console.log(favorites_list);
 
@@ -158,9 +159,10 @@ $(function(){
 
 	});
 
+	loadCategories();
+
 	createMap();
 
-	loadCategories();
 });
 
 function showPage(id, place_id){
@@ -256,6 +258,8 @@ function showPage(id, place_id){
 function loadCategories(){
 	$.post("assets/php/dl.php?file=http://localhost/api/categories", function(data) {
 		var cats = jQuery.parseJSON(data);
+		
+
 		$("#company_category").html("");
 
 		$("#company_category").append('<li data-id="all">Geef alle bedrijven weer</li>');
@@ -265,6 +269,9 @@ function loadCategories(){
 			$("#company_category").append('<li data-id="'+ cats[item].id +'"><span style="background-color: '+ cats[item].color +';"></span>'+ cats[item].name +'</li>');
 
 		}
+
+		categories = cats;
+
 	});
 }
 
@@ -298,7 +305,7 @@ function createMap(){
 
 	map = new google.maps.Map(document.getElementById('city-map'), mapOptions);
 
-	$.post("assets/php/dl.php?file=http://localhost/api/companies?fields=true", function(data) {
+	$.post("assets/php/dl.php?file=http://localhost/api/companies", function(data) {
 
 		var company_data = jQuery.parseJSON(data);
 
@@ -306,19 +313,22 @@ function createMap(){
 
 			console.log(company_data[i]);
 			location = new google.maps.LatLng(company_data[i].lat, company_data[i].lng);
-			
+
 			company_marker = new google.maps.Marker({
 			  position: location,
-			  map: map
+			  map: map,
+			  icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ categories[company_data[i].category].color.substring(1)
 		 	});
 
-		 	company_marker.company_id = company_data[i].id;
+		 	company_marker.company_id 	= company_data[i].id;
+		 	company_marker.company_cat 	= categories[company_data[i].category].color;	
+
+		 	//console.log("category", categories[company_data[i].category].color, company_data[i].category);
 	        
 	        (function(company_marker, i) {
 
 			  	google.maps.event.addListener(company_marker, 'click', function(data) {
 		  			showPage(2, company_marker.company_id);
-		  			console.log(company_marker.company_id)
 			  	});
 
 	        })(company_marker, i);
