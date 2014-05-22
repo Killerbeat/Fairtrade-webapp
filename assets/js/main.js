@@ -1,6 +1,8 @@
 var map;
-var favorites_list = localStorage.favorites? JSON.parse(localStorage.favorites) : [];
-var categories = "";
+var favorites_list 	= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
+var categories 		= "";
+var api 			= "http://fairtradeamsterdam.nl";
+var allMarkers 		= [];
 
 console.log(favorites_list);
 
@@ -19,17 +21,28 @@ $(function(){
 		showPage(1);
 	});
 
-	$("#company_category li").click(function(){
+	$(document).on("click", "#company_category li", function(){
 
-		if($(this).attr("data-id", 4)){
-			google.maps.Map.prototype.clearMarkers = function() {
-			    for(var i=0; i < this.markers.length; i++){
-			        this.markers[i].marker.setVisible(false);
-			    }
-			    this.markers = new Array();
-			};
+		console.log("click")
+
+		for (var company in allMarkers) {
+
+			console.log(allMarkers[company])
+
+			if($(this).attr("data-id") == "all"){
+				allMarkers[company].setMap(map);
+
+			}else{
+				if(allMarkers[company].company_cat !== parseInt($(this).attr("data-id"))){
+					allMarkers[company].setMap(null);
+				}else{
+					allMarkers[company].setMap(map);
+				}
+
+			}
+
+
 		}
-
 
 	});
 
@@ -70,7 +83,7 @@ $(function(){
 
 	    if(query !== "") {
 
-		    $.post("assets/php/dl.php?file=http://localhost/api/companies", function(data) {
+		    $.post(api +"/api/companies?fields=id,name,address", function(data) {
 		     	
 		    	var search_data 	= jQuery.parseJSON(data);
 		     	var results 		= [];		
@@ -208,9 +221,9 @@ function showPage(id, place_id){
 		//Company page
 		case 2:
 
-			console.log("assets/php/dl.php?file=http://localhost/api/companies?id="+ place_id);
+			console.log(api +"/api/companies?id="+ place_id);
 
-			$.post("assets/php/dl.php?file=http://localhost/api/companies?id="+ place_id, function(data) {
+			$.post(api +"/api/companies?id="+ place_id, function(data) {
 				var company_content = jQuery.parseJSON(data);
 
 				console.log(company_content);
@@ -256,7 +269,7 @@ function showPage(id, place_id){
 }
 
 function loadCategories(){
-	$.post("assets/php/dl.php?file=http://localhost/api/categories", function(data) {
+	$.post(api +"/api/categories", function(data) {
 		var cats = jQuery.parseJSON(data);
 		
 
@@ -277,7 +290,7 @@ function loadCategories(){
 
 function createFavorites(id){
 
-	$.post("assets/php/dl.php?file=http://localhost/api/companies?id="+ id, function(data) {
+	$.post(api +"/api/companies?id="+ id, function(data) {
 
 		console.log("assets/php/dl.php?file=http://localhost/api/companies?id="+ id)
 		var company_data = jQuery.parseJSON(data);
@@ -305,7 +318,7 @@ function createMap(){
 
 	map = new google.maps.Map(document.getElementById('city-map'), mapOptions);
 
-	$.post("assets/php/dl.php?file=http://localhost/api/companies", function(data) {
+	$.post(api +"/api/companies", function(data) {
 
 		var company_data = jQuery.parseJSON(data);
 
@@ -321,7 +334,7 @@ function createMap(){
 		 	});
 
 		 	company_marker.company_id 	= company_data[i].id;
-		 	company_marker.company_cat 	= categories[company_data[i].category].color;	
+		 	company_marker.company_cat 	= categories[company_data[i].category].id;	
 
 		 	//console.log("category", categories[company_data[i].category].color, company_data[i].category);
 	        
@@ -333,7 +346,11 @@ function createMap(){
 
 	        })(company_marker, i);
 
+	        allMarkers.push(company_marker);
+
 		}
+
+		console.log(allMarkers)
 
 	});
 
