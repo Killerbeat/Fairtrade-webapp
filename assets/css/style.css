@@ -188,6 +188,7 @@ footer #company_category_button {
 	width: 95%;
 	height: 50px;
 	color: white;
+	cursor: pointer;
 }
 
 footer #company_category_button span {
@@ -214,6 +215,7 @@ footer #company_category {
 
 footer #company_category li {
 	color: #fff;
+	cursor: pointer;
 	padding: 12px;
 	border-bottom: 1px solid rgb(0,0,0);
 }

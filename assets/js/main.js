@@ -218,8 +218,6 @@ function showPage(id, place_id){
 		//Company page
 		case 2:
 
-			console.log(api +"/api/companies?id="+ place_id);
-
 			$.post(api +"/api/companies?id="+ place_id, function(data) {
 
 				var company_content = jQuery.parseJSON(data);
@@ -344,31 +342,6 @@ function createMap(){
 		    allMarkers.push(company_marker);
 
 		});
-
-		/*for (var i = 0; i <= company_data.length; i++) {
-
-			
-
-			company_marker = new google.maps.Marker({
-				position: location,
-				map: map,
-				icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ 
-					categories[company_data[i].category].substring(1)
-			});
-
-			company_marker.company_id 	= company_data.id;
-			company_marker.company_cat 	= categories[company_data[i].category].id;	
-		        
-		    (function(company_marker, i) {
-
-				google.maps.event.addListener(company_marker, 'click', function(data) {
-			  		showPage(2, company_marker.company_id);
-				});
-
-		    })(company_marker, i);
-
-		    allMarkers.push(company_marker);
-		}*/
 
 	});
 
