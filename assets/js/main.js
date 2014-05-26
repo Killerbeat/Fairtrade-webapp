@@ -221,12 +221,16 @@ function showPage(id, place_id){
 			$.post(api +"/api/companies?id="+ place_id, function(data) {
 
 				var company_content = jQuery.parseJSON(data);
-					company_content	= company_content[0];
+					company_content	= company_content[0],
+					company_bg		= "assets/img/default.png";
 
-				console.log(company_content[0])
+				if(null != company_content.photo){
+					company_bg = "http://fairtradeamsterdam.nl/uploads/companies/"+ company_content.photo;
+				}
 
 				page_title.html("Fairtrade bedrijf");
 				company_title.html(company_content.name);
+				$("#company_title").css("background-image", "url("+ company_bg +")");
 				make_favorite.attr("data-id", place_id);
 
 				$("#company_decription").html(company_content.description);
@@ -285,10 +289,15 @@ function createFavorites(id){
 
 	$.post(api +"/api/companies?id="+ id, function(data) {
 
-		var company_data = jQuery.parseJSON(data);
-			company_data = company_data[0];
+		var company_data 	= jQuery.parseJSON(data);
+			company_data 	= company_data[0],
+			company_bg		= "assets/img/default.png";
 
-		var favorite_li = '<li style="background-image: url(assets/img/default.png)"><img src="assets/img/favorite.png" data-id="'+ id +'"><h2 data-id="'+ id +'">'+ company_data.name +'</h2></li>';
+		if(null != company_data.photo){
+			company_bg = "http://fairtradeamsterdam.nl/uploads/companies/"+ company_data.photo;
+		}
+
+		var favorite_li = '<li style="background-image: url('+ company_bg +')"><img src="assets/img/favorite.png" data-id="'+ id +'"><h2 data-id="'+ id +'">'+ company_data.name +'</h2></li>';
 
 		$("#favorites ul").append(favorite_li);
 	});
