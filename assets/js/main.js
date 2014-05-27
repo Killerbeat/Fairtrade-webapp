@@ -104,7 +104,7 @@ $(function(){
 			    		console.log(search_data[i].address)
 			    		results.push(Array(company_name, company_adress, search_data[i].id));
 			    	}
-			    	//if(i == 1){break}
+			    	if(i == 5){break}
 
 			    }
 

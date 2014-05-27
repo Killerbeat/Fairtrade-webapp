@@ -92,14 +92,16 @@ header {
 	overflow: auto;
 	z-index: 1;
 	position: relative;
+	width: 100%;
 }
 
 #page header {
-	position: fixed;
+	//position: fixed;
+	//-webkit-overflow-scrolling : touch;
 }
 
 #company {
-	margin-top: 50px;
+	//margin-top: 50px;
 }
 
 header h1 {
@@ -241,7 +243,6 @@ footer select option {
 #favorites ul {
 	margin:0px;
 	padding: 0px;
-	margin-top: 50px;
 }
 
 #company_title {
