@@ -21,6 +21,8 @@ $(function(){
 
 	$(document).on("click", "#company_category li", function(){
 
+		$("#company_category li").css("background-color", "none");
+
 		for (var company in allMarkers) {
 
 			if($(this).attr("data-id") == "all"){
@@ -39,6 +41,8 @@ $(function(){
 
 			}
 
+			$(this).css("background-color", "rgba(255, 127, 0, 0.32)");
+			$("#company_category").hide();
 
 		}
 
