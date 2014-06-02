@@ -6,13 +6,15 @@
 //map is used als id of the Google Maps object
 var map;
 //Load favorites array stored in localstorage
-var favorites_list 	= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
+var favorites_list 		= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
 //List with all company categories
-var categories 		= [];
+var categories 			= [];
 //API url to main website
-var api 			= "assets/php/dl.php?file=http://fairtradeamsterdam.nl";
+var api 				= "assets/php/dl.php?file=http://fairtradeamsterdam.nl";
 //Google maps marker array
-var allMarkers 		= [];
+var allMarkers 			= [];
+//All companies
+var company_data_list 	= "";
 
 $(function(){
 
@@ -22,6 +24,7 @@ $(function(){
 		if($("#search_results li").is(":visible")){
 			$("#search_results li").hide();
 		}else{
+			$("#company_category").hide();
 			$("#search_results li").show();
 		}
 	});
@@ -32,7 +35,7 @@ $(function(){
 	});
 
 	//If a category is selected display markers from this category
-	$(document).on("click", "#company_category li", function(){
+	$(document).on("click touchend", "#company_category li", function(){
 
 		//Reset hover
 		$("#company_category li").css("background-color", "none");
@@ -69,12 +72,12 @@ $(function(){
 
 
 	// Show company when favorite company is clicked
-	$(document).on("click", "#favorites h2", function(){
+	$(document).on("click touchstart", "#favorites h2", function(){
 		showPage(2, parseInt($(this).attr("data-id")));
 	});
 
 	// Go to company in search results after click
-	$(document).on("click", "#search_results li", function(){
+	$(document).on("click touchend", "#search_results li", function(){
 		showPage(2, parseInt($(this).attr("data-id")));
 	});
 
@@ -98,6 +101,7 @@ $(function(){
 	// Show catagory list
 	$("#company_category_button").click(function(){
 		$("#company_category").toggle();
+		$("#search_results").hide();
 
 		if($("#company_category").is(":visible")){
 			$("#company_category_button span").css("background-image", "url(assets/img/down.png)");
@@ -113,52 +117,45 @@ $(function(){
 
 	    if(query !== "") {
 
-	    	//Get company list
-		    $.post(api +"/api/companies?fields=id,name,address", function(data) {
-		     	
-		    	var search_data 	= jQuery.parseJSON(data);
-		     	var results 		= [];		
+	    	//Result array
+		    var results 		= [];		
 
-		     	//Loop through items
-			    for(var i=0;i<search_data.length;i++){
+		     //Find items with value
+			for(var i=0;i<company_data_list.length;i++){
 
-			    	//If value is in name add it to find array
-			    	if(search_data[i].name.indexOf(query) != -1){
+			    //If value is in name add it to find array
+			    if(company_data_list[i].name.indexOf(query) != -1){
 
-			    		var company_name = search_data[i].name.replace(query, "<span>"+ query +"</span>")
+			    	var company_name = company_data_list[i].name.replace(query, "<span>"+ query +"</span>")
 
-			    		results.push(Array(company_name, search_data[i].address, search_data[i].id));
-			    	}
-
-			    	//If value is in adress add it to find array
-			    	if(search_data[i].address.indexOf(query) != -1){
-
-			    		var company_name 	= search_data[i].name;
-			    		var company_adress 	= search_data[i].address.replace(query, "<span>"+ query +"</span>")
-
-			    		results.push(Array(company_name, company_adress, search_data[i].id));
-			    	}
-
-			    	//Maximum of five items
-			    	if(i == 5){break}
-
+			    	results.push(Array(company_name, company_data_list[i].address, company_data_list[i].id));
 			    }
 
-			console.log(results);
+			    //If value is in adress add it to find array
+			    if(company_data_list[i].address.indexOf(query) != -1){
 
-			    if(results.length !== 0){
+			    	var company_name 	= company_data_list[i].name;
+			    	var company_adress 	= company_data_list[i].address.replace(query, "<span>"+ query +"</span>")
 
-			    	$("#search_results").html("").show()
+			    	results.push(Array(company_name, company_adress, company_data_list[i].id));
+			    }
 
-				    for(var hit in results){
-				    	$("#search_results").append("<li data-id='"+ results[hit][2] +"'>"+ results[hit][0] +"<div>"+ results[hit][1] +"</div></li>");
-				    }	
+			    //Maximum of five items
+			    //if(results.length == 5){break}
+
+			}
+
+			if(results.length !== 0){
+
+			    $("#search_results").html("").show()
+
+				for(var hit in results){
+				    $("#search_results").append("<li data-id='"+ results[hit][2] +"'>"+ results[hit][0] +"<div>"+ results[hit][1] +"</div></li>");
+				}	
 
 			    }else{
 			    	$("#search_results").hide();
 			    }
-
-		    });
 
 	    }else{
 	    	$("#search_results").hide();
@@ -169,7 +166,7 @@ $(function(){
 	$("#city-map").height($(document).height() - 100);
 
 	//Remove company from favorites
-	$(document).on("click", "#favorites img", function(){
+	$(document).on("click touchstart", "#favorites img", function(){
 
 		$(this).attr("src", "assets/img/favorite_half.png")
 		var index = favorites_list.indexOf($(this).attr("data-id"));
@@ -388,7 +385,8 @@ function createMap(){
 	//Load all companies
 	$.post(api +"/api/companies", function(data) {
 
-		var company_data = jQuery.parseJSON(data);
+		var company_data 	= jQuery.parseJSON(data);
+		company_data_list 	= jQuery.parseJSON(data);
 
 		//Fetch all companies
 		$.each(company_data, function(key, company){
