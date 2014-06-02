@@ -210,7 +210,7 @@ footer #company_category {
 	bottom: 50px;
 	background-color: rgba(0,0,0,0.8);
 	width: 100%;
-	max-height: 80%;
+	max-height: 75%;
 	display: none;
 	overflow-y: auto;
 }

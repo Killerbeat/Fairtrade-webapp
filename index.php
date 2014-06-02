@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	
+	<!-- correct mobile tags -->
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,22 +11,27 @@
 
 	<link href="assets/css/style.css" rel="stylesheet" >
 
+	<!-- including libraries -->
 	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script>
 	<script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/geolocationmarker/src/geolocationmarker-compiled.js"></script>
 	
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	
+	<!-- main functions script-->
 	<script src="assets/js/main.js"></script>
 
 </head>
 <body id="main">
 
+	<!-- main container -->
 	<section id="app">
 
 		<section id="main">
 
+			<!-- sliding pane for transitions -->
 			<section id="pane">
 				
+				<!-- mappage -->
 				<article id="map">
 
 					<header>
@@ -58,6 +64,7 @@
 
 				</article>
 
+				<!-- dynamic page -->
 				<article id="page">
 
 					<header>

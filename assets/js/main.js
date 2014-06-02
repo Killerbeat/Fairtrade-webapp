@@ -1,11 +1,22 @@
+// Created By Martijn Grul
+// 2014 - Fairtrade Amsterdam
+
+// Global variables
+
+//map is used als id of the Google Maps object
 var map;
+//Load favorites array stored in localstorage
 var favorites_list 	= localStorage.favorites? JSON.parse(localStorage.favorites) : [];
+//List with all company categories
 var categories 		= [];
+//API url to main website
 var api 			= "assets/php/dl.php?file=http://fairtradeamsterdam.nl";
+//Google maps marker array
 var allMarkers 		= [];
 
 $(function(){
 
+	// Search icon click
 	$(".search").click(function(){
 		$(".menu input").toggle().focus();
 		if($("#search_results li").is(":visible")){
@@ -15,51 +26,66 @@ $(function(){
 		}
 	});
 
+	// Show favorites page
 	$("#map .favorite").click(function(){
 		showPage(1);
 	});
 
+	//If a category is selected display markers from this category
 	$(document).on("click", "#company_category li", function(){
 
+		//Reset hover
 		$("#company_category li").css("background-color", "none");
 
+		//Loop all markers to find correct category
 		for (var company in allMarkers) {
 
+			//If all company's item is clicked, show all companies
 			if($(this).attr("data-id") == "all"){
 				allMarkers[company].setMap(map);
 
+			//Else show only a specific category
 			}else{
 
-				console.log("marker cat: ", allMarkers[company].company_cat, "li cat:", 
-					parseInt($(this).attr("data-id")));
-
+				//Category is not correct, hide marker
 				if(allMarkers[company].company_cat !== $(this).attr("data-id")){
 					allMarkers[company].setMap(null);
+
+				//Else show marker
 				}else{
 					allMarkers[company].setMap(map);
 				}
 
 			}
 
+			//Make item hover
 			$(this).css("background-color", "rgba(255, 127, 0, 0.32)");
+			//Hide menu
 			$("#company_category").hide();
 
 		}
 
 	});
 
+
+	// Show company when favorite company is clicked
 	$(document).on("click", "#favorites h2", function(){
 		showPage(2, parseInt($(this).attr("data-id")));
 	});
 
+	// Go to company in search results after click
 	$(document).on("click", "#search_results li", function(){
 		showPage(2, parseInt($(this).attr("data-id")));
 	});
 
+
+	// Back button from dynamic screen
 	$(".back").click(function(){
 
+		//Reset position pane
 		$("#pane").css({"left": "0px"});
 
+		//After sliding reset page
 		setTimeout(function(){
 			$("#company_decription").html("");
 			$("#favorites ul").html("");
@@ -69,6 +95,7 @@ $(function(){
 
 	});
 
+	// Show catagory list
 	$("#company_category_button").click(function(){
 		$("#company_category").toggle();
 
@@ -79,35 +106,40 @@ $(function(){
 		}
 	});
 
+	// Search function
 	$("#fairtrade_search").keyup(function(){
 	   
 	    var query = $(this).val();
 
 	    if(query !== "") {
 
+	    	//Get company list
 		    $.post(api +"/api/companies?fields=id,name,address", function(data) {
 		     	
 		    	var search_data 	= jQuery.parseJSON(data);
 		     	var results 		= [];		
 
+		     	//Loop through items
 			    for(var i=0;i<search_data.length;i++){
 
+			    	//If value is in name add it to find array
 			    	if(search_data[i].name.indexOf(query) != -1){
 
 			    		var company_name = search_data[i].name.replace(query, "<span>"+ query +"</span>")
 
-			    		console.log(search_data[i].name)
 			    		results.push(Array(company_name, search_data[i].address, search_data[i].id));
 			    	}
 
+			    	//If value is in adress add it to find array
 			    	if(search_data[i].address.indexOf(query) != -1){
 
 			    		var company_name 	= search_data[i].name;
 			    		var company_adress 	= search_data[i].address.replace(query, "<span>"+ query +"</span>")
 
-			    		console.log(search_data[i].address)
 			    		results.push(Array(company_name, company_adress, search_data[i].id));
 			    	}
+
+			    	//Maximum of five items
 			    	if(i == 5){break}
 
 			    }
@@ -186,6 +218,7 @@ $(function(){
 
 function showPage(id, place_id){
 
+	//Page information
 	var page_title 		= $("#page h1"),
 		favorites 		= $("#favorites"),
 		company 		= $("#company"),
@@ -193,6 +226,7 @@ function showPage(id, place_id){
 		company_title	= $("#company_title h2"),
 		make_favorite	= $("#page .favorite");
 
+	//Switch pages
 	switch(id){
 
 		//Favorites page
@@ -202,18 +236,21 @@ function showPage(id, place_id){
 			menu_favorite.hide();
 			favorites.show();
 
+			// Check if there are favorites
 			if(Object.keys(favorites_list).length <= 0){
 				$("#favorites").html("<p>Je hebt nog geen favorite Fairtrade winkels</p>");
 			}else{
 
 				$("#favorites").html("<ul></ul>");
 
+				//Show favorites
 				for (var star in favorites_list) {
 					createFavorites(favorites_list[star]);
 				}
 
 			}
 
+			//Add favorites to localstorage array
 			localStorage.favorites = JSON.stringify(favorites_list)
 
 
@@ -222,16 +259,19 @@ function showPage(id, place_id){
 		//Company page
 		case 2:
 
+			//Load company information with ID
 			$.post(api +"/api/companies?id="+ place_id, function(data) {
 
 				var company_content = jQuery.parseJSON(data);
 					company_content	= company_content[0],
 					company_bg		= "assets/img/default.png";
 
+				//Check if company has a photo
 				if(null != company_content.photo){
 					company_bg = "http://fairtradeamsterdam.nl/uploads/companies/"+ company_content.photo;
 				}
 
+				//Fill page with info
 				page_title.html("Fairtrade bedrijf");
 				company_title.html(company_content.name);
 				$("#company_title").css("background-image", "url("+ company_bg +")");
@@ -246,6 +286,7 @@ function showPage(id, place_id){
 				favorites.hide();
 				menu_favorite.show();
 
+				//Check if page is favorite
 				for(var star in favorites_list){
 
 					if(make_favorite.attr("data-id") == favorites_list[star]){
@@ -257,6 +298,7 @@ function showPage(id, place_id){
 
 				}
 
+				//Add to favorites
 				localStorage.favorites = JSON.stringify(favorites_list);
 
 			});
@@ -265,53 +307,73 @@ function showPage(id, place_id){
 
 	}
 
+	//Show dynamic page
 	$("#pane").css({"left": "-100%"});
 
 }
 
+// Populate categories
 function loadCategories(){
+
+	//Load categories
 	$.post(api +"/api/categories", function(data) {
+		
+		//Main json array
 		var cats = jQuery.parseJSON(data);
 		
-
+		//Reset
 		$("#company_category").html("");
 
+		//Show all option
 		$("#company_category").append('<li data-id="all">Geef alle bedrijven weer</li>');
 
+		//Loop through items
 		for (var item in cats) {
+
+			//Add the item
 			$("#company_category").append('<li data-id="'+ cats[item].id +'"><span style="background-color: '+ cats[item].color +';"></span>'+ cats[item].name +'</li>');
 			categories[cats[item].id] = cats[item].color
 
 		}
 
-		console.log(categories);
-
 	});
 }
 
+
+// Populate favorite list
 function createFavorites(id){
 
+	//Load favorites
 	$.post(api +"/api/companies?id="+ id, function(data) {
 
+		//Favorite defaults and info
 		var company_data 	= jQuery.parseJSON(data);
 			company_data 	= company_data[0],
 			company_bg		= "assets/img/default.png";
 
+		//Check if company has a photo
 		if(null != company_data.photo){
 			company_bg = "http://fairtradeamsterdam.nl/uploads/companies/"+ company_data.photo;
 		}
 
+		//Create favorite item
 		var favorite_li = '<li style="background-image: url('+ company_bg +')"><img src="assets/img/favorite.png" data-id="'+ id +'"><h2 data-id="'+ id +'">'+ company_data.name +'</h2></li>';
 
+		//Add item
 		$("#favorites ul").append(favorite_li);
 	});
 
 
 }
 
+
+// Create google maps en populate it
 function createMap(){
+
+	//Marker location lat, lon
 	var location;
 
+	//Main map options
 	var mapOptions = {
 	    	zoom: 13,
 	    	streetViewControl: false,
@@ -320,56 +382,60 @@ function createMap(){
 	    	mapTypeId: google.maps.MapTypeId.ROADMAP
 	  	};
 
+	//Assign map object
 	map = new google.maps.Map(document.getElementById('city-map'), mapOptions);
 
+	//Load all companies
 	$.post(api +"/api/companies", function(data) {
 
 		var company_data = jQuery.parseJSON(data);
 
+		//Fetch all companies
 		$.each(company_data, function(key, company){
 
+			//Create marker location
 			location = new google.maps.LatLng(company.lat, company.lng);
 
+			//Company marker options
 			company_marker = new google.maps.Marker({
 				position: location,
 				map: map,
 				icon: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|"+ categories[company.category].substring(1)
 			});
 
-			//console.log(company.category, company.id)
-
+			//Assign ID & Category for later use
 			company_marker.company_id 	= company.id;
 			company_marker.company_cat 	= company.category;	
 
+			//Create function for each marker click event
 		    (function(company_marker, i) {
 
 				google.maps.event.addListener(company_marker, 'click', function(data) {
-			  		
-					console.log(company_marker.company_id)
-
 			  		showPage(2, parseInt(company_marker.company_id));
 				});
 
 		    })(company_marker, key);
 
+		    //Add marker to marker array
 		    allMarkers.push(company_marker);
 
 		});
 
 	});
 
+	// Create current position using geolocation
  	if(navigator.geolocation) {
  		
         GeoMarker = new GeolocationMarker();
         GeoMarker.setCircleOptions({fillColor: '#ff7f00'});
 
-        google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {
+        google.maps.event.addListenerOnce(GeoMarker, 'position_changed', function() {});
+
+        google.maps.event.addListener(GeoMarker, 'geolocation_error', function(err) {
+          console.log("Error: " + err.message);
         });
 
-        google.maps.event.addListener(GeoMarker, 'geolocation_error', function(e) {
-          console.log('There was an error obtaining your position. Message: ' + e.message);
-        });
-
+        //Place current position on the map
         GeoMarker.setMap(map);
   	}
 
